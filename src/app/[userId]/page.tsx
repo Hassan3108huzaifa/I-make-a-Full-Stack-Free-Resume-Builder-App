@@ -15,17 +15,18 @@ async function getResumes(userId: string) {
     return null
   }
 
-  const cookieStore = cookies()
-  const sessionToken = (await cookieStore).get('next-auth.session-token')?.value
+  const cookieStore = await cookies()
+  const sessionToken = cookieStore.get('next-auth.session-token')?.value
+  const secureSessionToken = cookieStore.get('__Secure-next-auth.session-token')?.value
   console.log('Session token:', sessionToken)
+  console.log('Secure session token:', secureSessionToken)
 
   try {
     const response = await fetch(`${process.env.NEXTAUTH_URL}/api/resumes/${userId}`, {
       headers: {
-        'Cookie': `next-auth.session-token=${sessionToken}`,
+        Cookie: `next-auth.session-token=${sessionToken || ''}; __Secure-next-auth.session-token=${secureSessionToken || ''}`
       },
       credentials: 'include',
-      cache: 'no-store',
     })
 
     if (!response.ok) {

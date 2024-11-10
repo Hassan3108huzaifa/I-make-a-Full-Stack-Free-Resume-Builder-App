@@ -1,26 +1,12 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import GoogleProvider from 'next-auth/providers/google'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { MongoClient } from 'mongodb'
+import clientPromise from '@/lib/mongodb'
+import { MongoDBAdapter } from "@next-auth/mongodb-adapter"
 import bcrypt from 'bcryptjs'
 
-declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined
-}
-
-const client = new MongoClient(process.env.MONGODB_URI!)
-let clientPromise: Promise<MongoClient>
-
-if (process.env.NODE_ENV === 'development') {
-  if (!global._mongoClientPromise) {
-    global._mongoClientPromise = client.connect()
-  }
-  clientPromise = global._mongoClientPromise
-} else {
-  clientPromise = client.connect()
-}
-
 export const authOptions: NextAuthOptions = {
+  adapter: MongoDBAdapter(clientPromise),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID!,
@@ -36,8 +22,8 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter both email and password')
         }
-        const mongoClient = await clientPromise
-        const db = mongoClient.db('resumeforge')
+        const client = await clientPromise
+        const db = client.db("resumeforge")
         const user = await db.collection('users').findOne({ email: credentials.email })
 
         if (!user || !user.password) {
@@ -53,7 +39,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user._id.toString(),
           email: user.email,
-          name: user.username,
+          name: user.name,
           image: user.image,
         }
       }
@@ -62,43 +48,37 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/signin',
   },
-  secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
   callbacks: {
-    async signIn({ user, account }) {
+    async signIn({ user, account, profile }) {
       if (account?.provider === 'google') {
-        try {
-          const mongoClient = await clientPromise
-          const db = mongoClient.db('resumeforge')
-          const usersCollection = db.collection('users')
+        const client = await clientPromise
+        const db = client.db("resumeforge")
+        const usersCollection = db.collection('users')
 
-          const existingUser = await usersCollection.findOne({ email: user.email })
+        const existingUser = await usersCollection.findOne({ email: user.email })
 
-          if (existingUser) {
-            await usersCollection.updateOne(
-              { email: user.email },
-              {
-                $set: {
-                  name: user.name,
-                  image: user.image,
-                  lastSignIn: new Date(),
-                },
-              }
-            )
-          } else {
-            await usersCollection.insertOne({
-              email: user.email,
-              name: user.name,
-              image: user.image,
-              createdAt: new Date(),
-              lastSignIn: new Date(),
-            })
-          }
-        } catch (error) {
-          console.error('Error saving user to MongoDB:', error)
-          return false
+        if (existingUser) {
+          await usersCollection.updateOne(
+            { email: user.email },
+            {
+              $set: {
+                name: user.name,
+                image: user.image,
+                lastSignIn: new Date(),
+              },
+            }
+          )
+        } else {
+          await usersCollection.insertOne({
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            createdAt: new Date(),
+            lastSignIn: new Date(),
+          })
         }
       }
       return true
@@ -111,9 +91,8 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub as string
+        session.user.id = token.id as string
       }
-      console.log('Session callback:', JSON.stringify(session, null, 2))
       return session
     },
   },
