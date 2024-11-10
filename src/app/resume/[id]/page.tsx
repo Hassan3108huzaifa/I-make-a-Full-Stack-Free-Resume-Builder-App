@@ -62,13 +62,13 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     };
   }
 
-  const pageTitle = `${resumeData.resumeData.name} - ${resumeData.theme.charAt(0).toUpperCase() + resumeData.theme.slice(1)} Resume | DocuResume`;
-  const pageDescription = `Explore a professional ${resumeData.theme} resume created with DocuResume. Customize your CV to stand out and showcase your skills.`;
+  const pageTitle = `${resumeData.resumeData.name} - ${resumeData.theme.charAt(0).toUpperCase() + resumeData.theme.slice(1)} Resume | FreeResumeBuilder`;
+  const pageDescription = `Explore a professional ${resumeData.theme} resume created with freeresumebuilder. Customize your CV to stand out and showcase your skills.`;
 
   return {
     title: pageTitle,
     description: pageDescription,
-    keywords: [`${resumeData.theme} resume`, 'professional resume', 'CV', 'DocuResume'],
+    keywords: [`${resumeData.theme} resume`, 'professional resume', 'CV', 'freeresumebuilder'],
     openGraph: {
       title: pageTitle,
       description: pageDescription,
