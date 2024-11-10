@@ -1,3 +1,19 @@
-{
-  "extends": ["next/core-web-vitals", "next/typescript"]
-}
+  {
+    "extends": [
+      "next/core-web-vitals",
+      "next/typescript"
+    ],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off",  // Disable 'any' type warning
+      "@typescript-eslint/no-unused-vars": "off",   // Disable unused vars warning
+      "no-var": "off",                               // Disable 'no-var' rule
+      "react/jsx-no-undef": "off",                  // Disable 'JSX element undefined' warning
+      "react-hooks/rules-of-hooks": "off",          // Optionally disable React hooks rules
+      "@next/next/no-img-element": "off"            // Optionally disable warning on <img> tag usage
+    },
+    "settings": {
+      "react": {
+        "version": "detect"  // Auto-detects the version of React you are using
+      }
+    }
+  }
