@@ -52,7 +52,7 @@ async function getResumeData(id: string) {
 
 // Dynamically set metadata for SEO
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const { id } = await params;
+  const { id } = params;
   const resumeData = await getResumeData(id);
 
   if (!resumeData) {
@@ -72,7 +72,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
     openGraph: {
       title: pageTitle,
       description: pageDescription,
-      url: `https://freeresumebuilder.vercel.app/resume/${id}`,
+      url: `https://freeresumebuilder-h.vercel.app/resume/${id}`,
       type: 'website',
     },
     twitter: {

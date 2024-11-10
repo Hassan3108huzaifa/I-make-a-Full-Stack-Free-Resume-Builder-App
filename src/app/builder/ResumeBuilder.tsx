@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -241,7 +241,8 @@ export default function ResumeBuilder() {
     }[selectedTheme] || ClassicResume
 
     return (
-        
+        <Suspense>
+
             <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row">
                 <div className="w-full lg:w-1/2 lg:pr-8 mb-8 lg:mb-0">
                     <h1 className="text-3xl font-bold mb-6">Build Your Resume</h1>
@@ -461,6 +462,8 @@ export default function ResumeBuilder() {
                     </AlertDialogContent>
                 </AlertDialog>
             </div>
+        </Suspense>
+
         
     )
 }

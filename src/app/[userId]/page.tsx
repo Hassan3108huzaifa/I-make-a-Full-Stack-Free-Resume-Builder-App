@@ -6,24 +6,26 @@ import UserResumesClient from './UserResumesClient'
 import { cookies } from 'next/headers'
 import Loader from '@/components/Loader'
 
-// Function to fetch resumes
 async function getResumes(userId: string) {
   const session = await getServerSession(authOptions)
+  console.log('Session:', JSON.stringify(session, null, 2))
 
   if (!session || session.user.id !== userId) {
-    console.warn('Session not found or user ID does not match')
+    console.warn('Session not found or user ID does not match', { sessionUserId: session?.user?.id, paramsUserId: userId })
     return null
   }
 
-  const cookieStore = await cookies() // Await cookies()
-  const sessionToken = cookieStore.get('next-auth.session-token')?.value
+  const cookieStore = cookies()
+  const sessionToken = (await cookieStore).get('next-auth.session-token')?.value
+  console.log('Session token:', sessionToken)
 
   try {
     const response = await fetch(`${process.env.NEXTAUTH_URL}/api/resumes/${userId}`, {
       headers: {
         'Cookie': `next-auth.session-token=${sessionToken}`,
       },
-      cache: 'no-store', // No caching for real-time data
+      credentials: 'include',
+      cache: 'no-store',
     })
 
     if (!response.ok) {
@@ -40,8 +42,7 @@ async function getResumes(userId: string) {
 }
 
 export default async function UserResumesPage({ params }: { params: { userId: string } }) {
-  // Await params to avoid async errors in accessing `params.userId`
-  const { userId } = params // Wait for params to resolve correctly
+  const { userId } = params
 
   const session = await getServerSession(authOptions)
 
@@ -55,7 +56,6 @@ export default async function UserResumesPage({ params }: { params: { userId: st
     notFound()
   }
 
-  // Fetch resumes data
   const resumesData = await getResumes(userId)
 
   if (!resumesData) {

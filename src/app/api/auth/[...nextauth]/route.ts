@@ -1,23 +1,23 @@
-import NextAuth, { NextAuthOptions } from 'next-auth';
-import GoogleProvider from 'next-auth/providers/google';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { MongoClient } from 'mongodb';
-import bcrypt from 'bcryptjs';
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import GoogleProvider from 'next-auth/providers/google'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { MongoClient } from 'mongodb'
+import bcrypt from 'bcryptjs'
 
 declare global {
-  var _mongoClientPromise: Promise<MongoClient> | undefined;
+  var _mongoClientPromise: Promise<MongoClient> | undefined
 }
 
-const client = new MongoClient(process.env.MONGODB_URI!);
-let clientPromise: Promise<MongoClient>;
+const client = new MongoClient(process.env.MONGODB_URI!)
+let clientPromise: Promise<MongoClient>
 
 if (process.env.NODE_ENV === 'development') {
   if (!global._mongoClientPromise) {
-    global._mongoClientPromise = client.connect();
+    global._mongoClientPromise = client.connect()
   }
-  clientPromise = global._mongoClientPromise;
+  clientPromise = global._mongoClientPromise
 } else {
-  clientPromise = client.connect();
+  clientPromise = client.connect()
 }
 
 export const authOptions: NextAuthOptions = {
@@ -36,15 +36,15 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error('Please enter both email and password')
         }
-        const mongoClient = await clientPromise;
-        const db = mongoClient.db('resumeforge');
-        const user = await db.collection('users').findOne({ email: credentials.email });
+        const mongoClient = await clientPromise
+        const db = mongoClient.db('resumeforge')
+        const user = await db.collection('users').findOne({ email: credentials.email })
 
         if (!user || !user.password) {
           throw new Error('No user found with this email')
         }
 
-        const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password);
+        const isPasswordCorrect = await bcrypt.compare(credentials.password, user.password)
 
         if (!isPasswordCorrect) {
           throw new Error('Invalid password')
@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.username,
           image: user.image,
-        };
+        }
       }
     })
   ],
@@ -70,11 +70,11 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
         try {
-          const mongoClient = await clientPromise;
-          const db = mongoClient.db('resumeforge');
-          const usersCollection = db.collection('users');
+          const mongoClient = await clientPromise
+          const db = mongoClient.db('resumeforge')
+          const usersCollection = db.collection('users')
 
-          const existingUser = await usersCollection.findOne({ email: user.email });
+          const existingUser = await usersCollection.findOne({ email: user.email })
 
           if (existingUser) {
             await usersCollection.updateOne(
@@ -86,7 +86,7 @@ export const authOptions: NextAuthOptions = {
                   lastSignIn: new Date(),
                 },
               }
-            );
+            )
           } else {
             await usersCollection.insertOne({
               email: user.email,
@@ -94,30 +94,31 @@ export const authOptions: NextAuthOptions = {
               image: user.image,
               createdAt: new Date(),
               lastSignIn: new Date(),
-            });
+            })
           }
         } catch (error) {
-          console.error('Error saving user to MongoDB:', error);
-          return false;
+          console.error('Error saving user to MongoDB:', error)
+          return false
         }
       }
-      return true;
+      return true
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id
       }
-      return token;
+      return token
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.sub as string
       }
-      return session;
+      console.log('Session callback:', JSON.stringify(session, null, 2))
+      return session
     },
   },
-};
+}
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth(authOptions)
 
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST }
