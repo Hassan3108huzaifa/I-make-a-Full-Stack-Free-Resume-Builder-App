@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     siteName: 'Free Resume Builder',
     images: [
       {
-        url: '/main-pic.png',
+        url: '/main-pic.jpg',
         width: 1200,
         height: 630,
         alt: 'Free Resume Builder Preview',
