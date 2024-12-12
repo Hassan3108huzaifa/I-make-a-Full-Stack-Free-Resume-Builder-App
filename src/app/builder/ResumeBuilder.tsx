@@ -103,6 +103,7 @@ export default function ResumeBuilder() {
     const [showAlert, setShowAlert] = useState<boolean>(false)
     const [showPublishConfirmation, setShowPublishConfirmation] = useState<boolean>(false)
     const [showSignInAlert, setShowSignInAlert] = useState<boolean>(false)
+    const [showRedirectMessage, setShowRedirectMessage] = useState(false); // Added state
     const resumeRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -202,8 +203,17 @@ export default function ResumeBuilder() {
                     const resumeUrl = `${window.location.origin}/resume/${data.id}`;
                     setShareLink(resumeUrl);
 
-                    // Redirect to the resume URL in a new tab
-                    window.open(resumeUrl, '_blank');
+                    // Attempt to open in a new tab
+                    const newWindow = window.open(resumeUrl, '_blank');
+                    
+                    // If the new window is null (blocked by popup blocker), redirect in the same tab
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        // Fallback: redirect in the same tab
+                        window.location.href = resumeUrl;
+                    } else {
+                        // If the new tab opened successfully, show a message to the user
+                        setShowRedirectMessage(true);
+                    }
                 } else {
                     alert("Failed to publish resume. Please try again.");
                 }
@@ -463,6 +473,15 @@ export default function ResumeBuilder() {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
+                {showRedirectMessage && (
+                    <Alert className="fixed bottom-4 right-4">
+                        <AlertTitle>Resume Published</AlertTitle>
+                        <AlertDescription>
+                            Your resume has been published and opened in a new tab. If you don't see it, please check your popup blocker settings.
+                        </AlertDescription>
+                        <Button onClick={() => setShowRedirectMessage(false)}>OK</Button>
+                    </Alert>
+                )}
             </div>
         </Suspense>
 
