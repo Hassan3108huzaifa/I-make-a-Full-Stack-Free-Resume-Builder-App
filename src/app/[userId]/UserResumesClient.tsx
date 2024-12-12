@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Eye, FileText, Trash2 } from 'lucide-react'
+import { Clock, Eye, FileText, Trash2, Loader2 } from 'lucide-react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import Image from 'next/image'
 
@@ -23,9 +23,19 @@ interface UserResumesClientProps {
   userId: string
 }
 
-export default function UserResumesClient({ resumes: initialResumes }: UserResumesClientProps) {
+export default function UserResumesClient({ resumes: initialResumes, userId }: UserResumesClientProps) {
   const [resumes, setResumes] = useState(initialResumes)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
+
+  useEffect(() => {
+    // Simulate loading delay
+    const timer = setTimeout(() => {
+      setLoading(false)
+    }, 1000)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const getThemeColor = (theme: string) => {
     const themeColors: { [key: string]: string } = {
@@ -52,6 +62,15 @@ export default function UserResumesClient({ resumes: initialResumes }: UserResum
     } catch (error) {
       console.error('Error deleting resume:', error)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-blue-500" />
+        <p className="mt-4 text-lg font-medium text-gray-700">Loading your resumes...</p>
+      </div>
+    )
   }
 
   return (
@@ -139,3 +158,4 @@ export default function UserResumesClient({ resumes: initialResumes }: UserResum
     </div>
   )
 }
+

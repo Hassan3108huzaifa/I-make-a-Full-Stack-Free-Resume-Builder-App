@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import Image from 'next/image';
+import { Loader2 } from 'lucide-react';
 
 interface AuthButtonProps {
   isMobile?: boolean;
@@ -21,11 +22,30 @@ export default function AuthButton({ isMobile = false }: AuthButtonProps) {
   const router = useRouter();
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNavigation = (href: string) => {
+  const handleNavigation = async (href: string) => {
     setIsOpen(false);
-    router.push(href);
+    if (href === `/${session?.user.id}`) {
+      setIsLoading(true);
+      try {
+        router.push(href);
+      } finally {
+        // Set loading to false after navigation
+        setIsLoading(false);
+      }
+    } else {
+      router.push(href);
+    }
   };
+
+  if (isLoading && isMobile) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <Loader2 className="h-8 w-8 animate-spin text-sky-500" />
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-center ${isMobile ? 'w-full flex-col space-y-2' : 'space-x-4'}`}>
@@ -53,7 +73,9 @@ export default function AuthButton({ isMobile = false }: AuthButtonProps) {
                 variant="ghost"
                 className={`p-0 h-12 rounded-full ${isMobile ? 'w-full justify-center' : 'w-12'}`}
               >
-                {session.user.image ? (
+                {isLoading ? (
+                  <Loader2 className="h-6 w-6 animate-spin text-sky-500" />
+                ) : session.user.image ? (
                   <Image
                     src={session.user.image}
                     alt="Profile"
@@ -104,3 +126,4 @@ export default function AuthButton({ isMobile = false }: AuthButtonProps) {
     </div>
   );
 }
+

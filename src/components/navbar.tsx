@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, FileText } from 'lucide-react'
@@ -21,7 +21,7 @@ export function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const closeMenu = () => setIsOpen(false)
+  const closeMenu = useCallback(() => setIsOpen(false), [])
 
   const navItems = [
     { name: 'Home', href: '/' },
@@ -54,10 +54,11 @@ export function Navbar() {
     }
   }
 
-  const handleNavigation = (href: string) => {
+  const handleNavigation = useCallback((href: string) => {
     closeMenu()
+    router.prefetch(href)
     router.push(href)
-  }
+  }, [closeMenu, router])
 
   return (
     <>
@@ -84,7 +85,7 @@ export function Navbar() {
                   <Link
                     href={item.href}
                     className="text-gray-700 hover:text-sky-600 transition-colors font-medium"
-                    prefetch
+                    prefetch={item.href === '/[userId]'}
                     onClick={(e) => {
                       e.preventDefault()
                       handleNavigation(item.href)
@@ -140,7 +141,7 @@ export function Navbar() {
                       key={item.name}
                       href={item.href}
                       className="text-lg font-medium text-gray-700 hover:text-blue-600 transition-colors"
-                      prefetch
+                      prefetch={item.href === '/[userId]'}
                       onClick={(e) => {
                         e.preventDefault()
                         handleNavigation(item.href)
@@ -161,3 +162,4 @@ export function Navbar() {
     </>
   )
 }
+
