@@ -1,3 +1,5 @@
+// src/types/next-auth.d.ts
+
 import NextAuth, { DefaultSession } from 'next-auth'
 
 declare module 'next-auth' {
@@ -8,7 +10,8 @@ declare module 'next-auth' {
     user: {
       /** The user's unique identifier */
       id: string
-    } & DefaultSession['user']
+      provider?: string  // Add provider here
+    } & DefaultSession['user'] // Preserve all other properties of the default user object
   }
 
   /**
@@ -18,13 +21,15 @@ declare module 'next-auth' {
   interface User {
     /** The user's unique identifier */
     id: string
+    provider?: string  // Add provider here, as we are using it in the session and JWT
   }
 }
 
-// Extend the JWT type to include the user id
+// Extend the JWT type to include the user id and provider
 declare module 'next-auth/jwt' {
   interface JWT {
     /** The user's unique identifier */
     id?: string
+    provider?: string  // Add provider here to reflect the session callback
   }
 }

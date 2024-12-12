@@ -5,6 +5,13 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import UserResumesClient from './UserResumesClient'
 import { cookies } from 'next/headers'
 import Loader from '@/components/Loader'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'My Resumes | Manage Your Created Resumes',
+  description: "Access and manage all the resumes you've created with our free resume builder. Edit, download, or create new resumes easily.",
+  keywords: ['user profile', 'manage resumes', 'resume dashboard', 'edit CV'],
+}
 
 async function getResumes(userId: string) {
   const session = await getServerSession(authOptions)

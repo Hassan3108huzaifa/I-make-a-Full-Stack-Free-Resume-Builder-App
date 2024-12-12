@@ -6,13 +6,15 @@ export default function CreativeResume({ data }: { data: ResumeData }) {
     <div className="font-sans bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 text-white p-8 max-w-4xl mx-auto shadow-lg rounded-lg">
       <header className="text-center mb-8">
         {data.picture && (
-        <Image
-        src={data.picture}
-        alt={data.name}
-        width={160}  // width and height for the image
-        height={160}
-        className="rounded-full object-cover mx-auto mb-4 border-4 border-white"
-      />
+         <div className="w-28 h-28 rounded-full overflow-hidden">
+         <Image
+           src={data.picture}
+           alt={data.name}
+           width={128}
+           height={128}
+           className="object-cover w-full h-full"
+         />
+       </div>
         )}
         <h1 className="text-5xl font-bold mb-2">{data.name}</h1>
         <div className="flex justify-center space-x-4">

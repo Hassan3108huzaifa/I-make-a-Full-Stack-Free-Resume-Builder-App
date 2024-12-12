@@ -409,11 +409,13 @@ export default function ResumeBuilder() {
                     </div>
                 </div>
 
-                <div className="w-full lg:w-1/2 lg:pl-8">
+                <div className="w-full lg:w-1/2 lg:pl-8 overflow-x-auto">
                     <h2 className="text-2xl font-bold mb-4">Resume Preview</h2>
-                    <div id="resume-to-download" ref={resumeRef}
-                        className="border p-4 rounded-lg resume-preview">
-                        <ResumePreview data={resumeData} />
+                    <div className="min-w-[800px]"> {/* Adjust this value as needed */}
+                        <div id="resume-to-download" ref={resumeRef}
+                            className="border p-4 rounded-lg resume-preview">
+                            <ResumePreview data={resumeData} />
+                        </div>
                     </div>
                 </div>
 
@@ -464,6 +466,7 @@ export default function ResumeBuilder() {
             </div>
         </Suspense>
 
-        
+
     )
 }
+

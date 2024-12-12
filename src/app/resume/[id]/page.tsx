@@ -25,7 +25,6 @@ function isValidObjectId(id: string): boolean {
 async function getResumeData(id: string) {
   // Check if ID is valid
   if (!isValidObjectId(id)) {
-  
     return null;
   }
 
@@ -35,10 +34,8 @@ async function getResumeData(id: string) {
     const resume = await db.collection("resumes").findOne({ _id: new ObjectId(id) });
 
     if (!resume) {
-      
       return null;
     }
-
 
     return {
       resumeData: resume.data as ResumeData,
@@ -109,13 +106,16 @@ export default async function ResumePage({ params }: { params: { id: string } })
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
         <h1 className="text-3xl font-bold">{resumeData.resumeData.name}&apos;s Resume</h1>
         <DownloadButtons resumeData={resumeData} />
       </div>
-      <div className="border p-4 rounded-lg" id="resume-content">
-        <ResumeComponent data={resumeData.resumeData} />
+      <div className="overflow-x-auto">
+        <div className="border p-4 rounded-lg min-w-[800px]" id="resume-content">
+          <ResumeComponent data={resumeData.resumeData} />
+        </div>
       </div>
     </div>
   );
 }
+

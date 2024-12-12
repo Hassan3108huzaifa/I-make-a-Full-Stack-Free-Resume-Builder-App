@@ -16,13 +16,15 @@ export default function ExecutiveEleganceResume({ data }: { data: ResumeData }) 
             </div>
           </div>
           {data.picture && (
-            <Image
-              src={data.picture}
-              alt={data.name}
-              width={100}
-              height={100}
-              className="rounded-full object-cover border-4 border-white"
-            />
+             <div className="w-28 h-28 rounded-full overflow-hidden">
+             <Image
+               src={data.picture}
+               alt={data.name}
+               width={128}
+               height={128}
+               className="object-cover w-full h-full"
+             />
+           </div>
           )}
         </div>
       </header>

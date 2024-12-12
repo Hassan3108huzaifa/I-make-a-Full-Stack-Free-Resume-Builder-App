@@ -20,8 +20,37 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Free Resume Builder | Create Professional Resumes Effortlessly",
-  description: "Free Resume Builder offers a seamless way to craft professional, ATS-optimized resumes. Start building your perfect resume today with ease!",
+  metadataBase: new URL('https://freeresumebuilder-h.vercel.app'),
+  title: {
+    default: 'Free Resume Builder | Create Professional Resumes Effortlessly',
+    template: '%s | Free Resume Builder'
+  },
+  description: 'Free Resume Builder offers a seamless way to craft professional, ATS-optimized resumes. Start building your perfect resume today with ease!',
+  keywords: ['resume builder', 'free resume', 'professional resume', 'ATS-optimized resume', 'CV maker', 'free resume builder'],
+  authors: [{ name: 'HassanRJ' }],
+  creator: 'HassanRJ',
+  publisher: 'FreeResumeBuilder',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://freeresumebuilder-h.vercel.app',
+    title: 'Free Resume Builder | Create Professional Resumes Effortlessly',
+    description: 'Craft professional, ATS-optimized resumes with our Free Resume Builder. Stand out to employers and land your dream job!',
+    siteName: 'Free Resume Builder',
+    images: [
+      {
+        url: '/main-pic.png',
+        width: 1200,
+        height: 630,
+        alt: 'Free Resume Builder Preview',
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -50,3 +79,4 @@ export default function RootLayout({
     </html>
   );
 }
+

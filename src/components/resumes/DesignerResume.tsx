@@ -12,13 +12,15 @@ export default function DesignerResume({ data }: { data: ResumeData }) {
             <p className="text-xl">{data.experience[0]?.position || 'Creative Designer'}</p>
           </div>
           {data.picture && (
+            <div className="w-28 h-28 rounded-full overflow-hidden">
             <Image
               src={data.picture}
               alt={data.name}
-              width={128}  // width and height for the image
+              width={128}
               height={128}
-              className="w-32 h-32 rounded-full border-4 border-white shadow-lg mt-4 md:mt-0"
+              className="object-cover w-full h-full"
             />
+          </div>
             )}
         </div>
       </header>
