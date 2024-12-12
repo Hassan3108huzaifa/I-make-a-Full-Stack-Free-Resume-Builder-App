@@ -51,9 +51,6 @@ const themes: Theme[] = [
 ]
 
 export default function ResumeBuilder() {
-
-
-
     const route = useRouter()
     const { data: session, status } = useSession()
     const searchParams = useSearchParams()
@@ -103,7 +100,8 @@ export default function ResumeBuilder() {
     const [showAlert, setShowAlert] = useState<boolean>(false)
     const [showPublishConfirmation, setShowPublishConfirmation] = useState<boolean>(false)
     const [showSignInAlert, setShowSignInAlert] = useState<boolean>(false)
-    const [showRedirectMessage, setShowRedirectMessage] = useState(false); // Added state
+    const [showRedirectMessage, setShowRedirectMessage] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const resumeRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -152,16 +150,13 @@ export default function ResumeBuilder() {
         }))
     }
 
-
     useEffect(() => {
         if (status === 'unauthenticated' && typeof window !== 'undefined') {
           setShowSignInAlert(true)
         } else if (status === 'authenticated') {
           setShowSignInAlert(false)
         }
-      }, [status])
-
-
+    }, [status])
 
     const handlePublish = async () => {
         if (!session) {
@@ -175,11 +170,11 @@ export default function ResumeBuilder() {
         }
 
         setShowPublishConfirmation(true)
-
     }
 
     const handleConfirmPublish = async () => {
         setShowPublishConfirmation(false);
+        setIsLoading(true);
 
         try {
             // Generate image of the resume
@@ -221,9 +216,10 @@ export default function ResumeBuilder() {
         } catch (error) {
             console.error("Error publishing resume:", error);
             alert("An error occurred while publishing. Please check your internet connection and try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
-
 
     const handlePictureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0]
@@ -250,9 +246,20 @@ export default function ResumeBuilder() {
         'creativepro': CreativeProfessionalResume,
     }[selectedTheme] || ClassicResume
 
+    if (isLoading) {
+        return (
+            <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <p className="text-xl font-semibold">Publishing your resume...</p>
+                    <p className="text-gray-600 mt-2">Please wait while we process your information.</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <Suspense>
-
             <div className="container mx-auto px-4 py-8 flex flex-col lg:flex-row">
                 <div className="w-full lg:w-1/2 lg:pr-8 mb-8 lg:mb-0">
                     <h1 className="text-3xl font-bold mb-6">Build Your Resume</h1>
@@ -410,18 +417,14 @@ export default function ResumeBuilder() {
 
                     <div className="mt-8 space-y-4">
                         <Button onClick={handlePublish}>
-                            <p onClick={() => { route.push(shareLink) }}>
-
-                                publish Resume
-                            </p>
+                            Publish Resume
                         </Button>
-
                     </div>
                 </div>
 
                 <div className="w-full lg:w-1/2 lg:pl-8 overflow-x-auto">
                     <h2 className="text-2xl font-bold mb-4">Resume Preview</h2>
-                    <div className="min-w-[800px]"> {/* Adjust this value as needed */}
+                    <div className="min-w-[800px]">
                         <div id="resume-to-download" ref={resumeRef}
                             className="border p-4 rounded-lg resume-preview">
                             <ResumePreview data={resumeData} />
@@ -454,11 +457,6 @@ export default function ResumeBuilder() {
                     </AlertDialogContent>
                 </AlertDialog>
 
-
-
-
-
-
                 <AlertDialog open={showPublishConfirmation} onOpenChange={setShowPublishConfirmation}>
                     <AlertDialogContent>
                         <AlertDialogHeader>
@@ -484,8 +482,6 @@ export default function ResumeBuilder() {
                 )}
             </div>
         </Suspense>
-
-
     )
 }
 
